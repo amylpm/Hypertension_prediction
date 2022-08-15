@@ -1,20 +1,34 @@
 install.packages('imputeTS')
-install.packages('readxl')
 install.packages('ggplot2')
 install.packages('dplyr')
 install.packages('zoo')
-
-
+install.packages('xts')
+install.packages('forecast')
+install.packages('lubridate')
 library('ggplot2')
-library("readxl")
 library('imputeTS')
 library(dplyr)
 library(zoo)
+library(xts)
+library(forecast)
+library(lubridate)   
+setwd('C:/Users/User/Documents/GitHub/Hypertension_prediction/Hypertension/Codebase/Hypertension_code_amy/Output')
 
-df <- read_excel("C:/Users/User/Documents/GitHub/Hypertension_prediction/Hypertension/Codebase/Hypertension_code_amy/Mappings.xlsx")
-df_grp_id = df %>% group_by(UserID) 
-View(df_grp_id)
+df <- read.csv("./missing_value_imputed/p9690_missing.csv")
+ts9690_s = df[c(1,3)]
+ts9690_s$Day = day(ts9690_s$Timestamp)
+ts9690_s$Hour = as.integer(substr(ts9690_s$Timestamp,12,13))
+ts9690_s = ts(ts9690_s[,2], frequency = 23)
+plot(ts9690_s)
+statsNA(ts9690_s)
 
+ggplot_na_distribution(ts9690_s)
+ggplot_na_intervals(ts9690_s)
+ggplot_na_gapsize(ts9690_s)
 
-
-write.xlsx()
+x =na_interpolation(ts9690_s,option = 'stine')
+ggplot_na_imputations(ts9690_s,x)
+y =na_kalman(ts9690_s)
+ggplot_na_imputations(ts9690_s,y)
+z =na_locf(ts9690_s)
+ggplot_na_imputations(ts9690_s,y)
