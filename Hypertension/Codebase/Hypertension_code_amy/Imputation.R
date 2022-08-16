@@ -9,18 +9,26 @@ df <- read.csv("./missing_value_imputed/p9690_missing.csv")
 df[['Timestamp']] <- strptime(df[['Timestamp']],format = "%Y-%m-%d %H:%M:%S")
 
 #first seperate into subsets of systolic, diastolic and heart rate
-ts9690_s = df[c(1,3)]
-ts9690_d = df[c(1,4)]
-ts9690_hr = df[c(1,5)]
+#ts9690_s = df[c(1,3)]
+#ts9690_d = df[c(1,4)]
+#ts9690_hr = df[c(1,5)]
 
 #create time series
-str(ts9690_s)
-ts9690_s %>% as_tsibble(index = Timestamp)
-ts9690_d %>% as_tsibble(index = Timestamp)
-ts9690_hr %>% as_tsibble(index = Timestamp)
-ts9690_s %>% as.ts()
-ts9690_d %>% as.ts()
-ts9690_hr %>% as.ts()
+#str(ts9690_s)
+#ts9690_s = ts9690_s %>% as_tsibble(index = Timestamp)
+#ts9690_d = ts9690_d %>% as_tsibble(index = Timestamp)
+#ts9690_hr =ts9690_hr %>% as_tsibble(index = Timestamp)
+
+#using xts 
+time_index <- seq(from = as.POSIXct("2018-05-16 11:00:00"), 
+                  to = as.POSIXct("2019-01-23 08:00:00"), by = "hour")
+
+df = xts(df, order.by = time_index)
+df[,3:5] = apply(df[,3:5],2,as.numeric)
+ts9690_s = df[,3]
+ts9690_d = df[,4]
+ts9690_hr = df[,5]
+
 
 #create 70 30 train test 
 split<- seq_len(length.out = floor(x = 0.7 * nrow(x = df)))
@@ -48,3 +56,6 @@ ggplot_na_imputations(ts9690_s,y)
 z =na_locf(ts9690_s)
 
 ggplot_na_imputations(ts9690_s,y)
+
+
+
